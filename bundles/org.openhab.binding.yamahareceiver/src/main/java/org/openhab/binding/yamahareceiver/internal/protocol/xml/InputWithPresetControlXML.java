@@ -97,57 +97,58 @@ public class InputWithPresetControlXML extends AbstractInputControlXML implement
             return;
         }
 
-        YamahaReceiverBindingConstants.Feature inputFeature = YamahaUtils.tryParseEnum(YamahaReceiverBindingConstants.Feature.class, inputElement);
-        if (inputFeature != YamahaReceiverBindingConstants.Feature.SPOTIFY) {
-            AbstractConnection con = comReference.get();
-            Node response = getResponse(con,
+        if (inputElement != null && (inputElement.equals("Spotify") || inputElement.equals("SPOTIFY"))) {
+            return;
+        }
+
+        AbstractConnection con = comReference.get();
+        Node response = getResponse(con,
                     wrInput("<Play_Control><Preset><Preset_Sel_Item>GetParam</Preset_Sel_Item></Preset></Play_Control>"),
                     inputElement);
 
-            PresetInfoState msg = new PresetInfoState();
+        PresetInfoState msg = new PresetInfoState();
 
-            // Set preset channel names, obtained from this xpath:
-            // NET_RADIO/Play_Control/Preset/Preset_Sel_Item/Item_1/Title
-            Node presetNode = getNode(response, "Play_Control/Preset/Preset_Sel_Item");
-            if (presetNode != null) {
-                for (int i = 1; i <= PRESET_CHANNELS; i++) {
-                    Node itemNode = getNode(presetNode, "Item_" + i);
-                    if (itemNode == null) {
-                        break;
-                    }
-
-                    String title = getNodeContentOrDefault(itemNode, "Title", "Item_" + i);
-                    String value = getNodeContentOrDefault(itemNode, "Param", String.valueOf(i));
-
-                    // For RX-V3900 when a preset slot is not used, this is how it looks
-                    if (StringUtils.isEmpty(title) && "Not Used".equalsIgnoreCase(value)) {
-                        continue;
-                    }
-
-                    int presetChannel = convertToPresetNumber(value);
-                    PresetInfoState.Preset preset = new PresetInfoState.Preset(title, presetChannel);
-                    msg.presetChannelNames.add(preset);
+        // Set preset channel names, obtained from this xpath:
+        // NET_RADIO/Play_Control/Preset/Preset_Sel_Item/Item_1/Title
+        Node presetNode = getNode(response, "Play_Control/Preset/Preset_Sel_Item");
+        if (presetNode != null) {
+            for (int i = 1; i <= PRESET_CHANNELS; i++) {
+                Node itemNode = getNode(presetNode, "Item_" + i);
+                if (itemNode == null) {
+                    break;
                 }
-            }
-            msg.presetChannelNamesChanged = true;
 
-            String presetValue = getNodeContentOrEmpty(response, preset.getPath());
+                String title = getNodeContentOrDefault(itemNode, "Title", "Item_" + i);
+                String value = getNodeContentOrDefault(itemNode, "Param", String.valueOf(i));
 
-            // fall back to second method of obtaining current preset (works for Tuner on RX-V3900)
-            if (StringUtils.isEmpty(presetValue)) {
-                try {
-                    Node presetResponse = getResponse(con, wrInput(preset.apply(GET_PARAM)), inputElement);
-                    presetValue = getNodeContentOrEmpty(presetResponse, preset.getPath());
-                } catch (IOException | ReceivedMessageParseException e) {
-                    // this is on purpose, in case the AVR does not support this request and responds with error or nonsense
+                // For RX-V3900 when a preset slot is not used, this is how it looks
+                if (StringUtils.isEmpty(title) && "Not Used".equalsIgnoreCase(value)) {
+                    continue;
                 }
+
+                int presetChannel = convertToPresetNumber(value);
+                PresetInfoState.Preset preset = new PresetInfoState.Preset(title, presetChannel);
+                msg.presetChannelNames.add(preset);
             }
-
-            // For Tuner input on RX-V3900 this is not a number (e.g. "A1" or "B1").
-            msg.presetChannel = convertToPresetNumber(presetValue);
-
-            observer.presetInfoUpdated(msg);
         }
+        msg.presetChannelNamesChanged = true;
+
+        String presetValue = getNodeContentOrEmpty(response, preset.getPath());
+
+        // fall back to second method of obtaining current preset (works for Tuner on RX-V3900)
+        if (StringUtils.isEmpty(presetValue)) {
+            try {
+                Node presetResponse = getResponse(con, wrInput(preset.apply(GET_PARAM)), inputElement);
+                presetValue = getNodeContentOrEmpty(presetResponse, preset.getPath());
+            } catch (IOException | ReceivedMessageParseException e) {
+                // this is on purpose, in case the AVR does not support this request and responds with error or nonsense
+            }
+        }
+
+        // For Tuner input on RX-V3900 this is not a number (e.g. "A1" or "B1").
+        msg.presetChannel = convertToPresetNumber(presetValue);
+
+        observer.presetInfoUpdated(msg);
     }
 
     private int convertToPresetNumber(String presetValue) {
