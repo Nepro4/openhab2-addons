@@ -67,8 +67,7 @@ public class DaikinAcUnitHandler extends BaseThingHandler {
     public void handleCommand(ChannelUID channelUID, Command command) {
         try {
             handleCommandInternal(channelUID, command);
-
-            poll();
+            //poll();
         } catch (DaikinCommunicationException ex) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, ex.getMessage());
         }
