@@ -97,7 +97,7 @@ public class InputWithPresetControlXML extends AbstractInputControlXML implement
             return;
         }
 
-        if (inputElement != null && (inputElement.equals("Spotify") || inputElement.equals("SPOTIFY"))) {
+        if (inputElement != null && ((inputElement.equals("Bluetooth") || inputElement.equals("BLUETOOTH")) || ((inputElement.equals("Spotify") || inputElement.equals("SPOTIFY"))))) {
             return;
         }
 
