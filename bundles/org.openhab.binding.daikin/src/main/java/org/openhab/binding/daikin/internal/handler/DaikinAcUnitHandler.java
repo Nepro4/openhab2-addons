@@ -52,6 +52,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DaikinAcUnitHandler extends BaseThingHandler {
 
+    private static final int POLL_RETRY_COUNT = 2;
+
     private final Logger logger = LoggerFactory.getLogger(DaikinAcUnitHandler.class);
 
     private long refreshInterval;
@@ -165,28 +167,56 @@ public class DaikinAcUnitHandler extends BaseThingHandler {
     }
 
     private void pollStatus() throws IOException {
-        ControlInfo controlInfo = webTargets.getControlInfo();
-        updateStatus(ThingStatus.ONLINE);
-        if (controlInfo != null) {
-            updateState(DaikinBindingConstants.CHANNEL_AC_POWER, controlInfo.power ? OnOffType.ON : OnOffType.OFF);
-            updateTemperatureChannel(DaikinBindingConstants.CHANNEL_AC_TEMP, controlInfo.temp);
+        for (int i = 0; i < POLL_RETRY_COUNT; i++) {
+            try {
+                ControlInfo controlInfo = webTargets.getControlInfo();
+                updateStatus(ThingStatus.ONLINE);
+                if (controlInfo != null) {
+                    updateState(DaikinBindingConstants.CHANNEL_AC_POWER, controlInfo.power ? OnOffType.ON : OnOffType.OFF);
+                    updateTemperatureChannel(DaikinBindingConstants.CHANNEL_AC_TEMP, controlInfo.temp);
 
-            updateState(DaikinBindingConstants.CHANNEL_AC_MODE, new StringType(controlInfo.mode.name()));
-            updateState(DaikinBindingConstants.CHANNEL_AC_FAN_SPEED, new StringType(controlInfo.fanSpeed.name()));
-            updateState(DaikinBindingConstants.CHANNEL_AC_FAN_DIR, new StringType(controlInfo.fanMovement.name()));
+                    updateState(DaikinBindingConstants.CHANNEL_AC_MODE, new StringType(controlInfo.mode.name()));
+                    updateState(DaikinBindingConstants.CHANNEL_AC_FAN_SPEED, new StringType(controlInfo.fanSpeed.name()));
+                    updateState(DaikinBindingConstants.CHANNEL_AC_FAN_DIR, new StringType(controlInfo.fanMovement.name()));
+                }
+                break;
+            } catch (DaikinCommunicationException ex) {
+                if (i == POLL_RETRY_COUNT - 1)
+                    throw ex;
+                sleep(1000);
+                continue;
+            }
         }
 
-        SensorInfo sensorInfo = webTargets.getSensorInfo();
-        if (sensorInfo != null) {
-            updateTemperatureChannel(DaikinBindingConstants.CHANNEL_INDOOR_TEMP, sensorInfo.indoortemp);
+        for (int i = 0; i < POLL_RETRY_COUNT; i++) {
+            try {
+                SensorInfo sensorInfo = webTargets.getSensorInfo();
+                if (sensorInfo != null) {
+                    updateTemperatureChannel(DaikinBindingConstants.CHANNEL_INDOOR_TEMP, sensorInfo.indoortemp);
 
-            updateTemperatureChannel(DaikinBindingConstants.CHANNEL_OUTDOOR_TEMP, sensorInfo.outdoortemp);
+                    updateTemperatureChannel(DaikinBindingConstants.CHANNEL_OUTDOOR_TEMP, sensorInfo.outdoortemp);
 
-            if (sensorInfo.indoorhumidity.isPresent()) {
-                updateState(DaikinBindingConstants.CHANNEL_HUMIDITY, new DecimalType(sensorInfo.indoorhumidity.get()));
-            } else {
-                updateState(DaikinBindingConstants.CHANNEL_HUMIDITY, UnDefType.UNDEF);
+                    if (sensorInfo.indoorhumidity.isPresent()) {
+                        updateState(DaikinBindingConstants.CHANNEL_HUMIDITY, new DecimalType(sensorInfo.indoorhumidity.get()));
+                    } else {
+                        updateState(DaikinBindingConstants.CHANNEL_HUMIDITY, UnDefType.UNDEF);
+                    }
+                }
+                break;
+            } catch (DaikinCommunicationException ex) {
+                if (i == POLL_RETRY_COUNT - 1)
+                    throw ex;
+                sleep(1000);
+                continue;
             }
+        }
+    }
+
+    private void sleep(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            logger.debug("Sleep failed: {}", e.toString());
         }
     }
 
