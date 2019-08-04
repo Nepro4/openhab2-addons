@@ -695,6 +695,7 @@ public class F1X45 {
                     put(47540, new VariableInformation(   1, NibeDataType.S16, Type.SETTING , "Heat DM diff"));
                     put(47543, new VariableInformation(   1, NibeDataType.S16, Type.SETTING , "Cooling DM diff"));
                     put(47570, new VariableInformation(   1, NibeDataType.U8 , Type.SETTING , "Operational mode"));
+                    put(48043, new VariableInformation(   1, NibeDataType.U8 , Type.SETTING , "Holiday - Activated"));
                     put(48053, new VariableInformation(   1, NibeDataType.U8 , Type.SETTING , "FLM 2 speed 4"));
                     put(48054, new VariableInformation(   1, NibeDataType.U8 , Type.SETTING , "FLM 2 speed 3"));
                     put(48055, new VariableInformation(   1, NibeDataType.U8 , Type.SETTING , "FLM 2 speed 2"));
@@ -725,6 +726,7 @@ public class F1X45 {
                     put(48092, new VariableInformation(  10, NibeDataType.S16, Type.SETTING , "Pool 1 stop temp."));
                     put(48093, new VariableInformation(   1, NibeDataType.U8 , Type.SETTING , "Pool 2 Activated"));
                     put(48094, new VariableInformation(   1, NibeDataType.U8 , Type.SETTING , "Pool 1 Activated"));
+	                put(48132, new VariableInformation(   1, NibeDataType.S8 , Type.SETTING , "Temporary Lux"));
                     put(48133, new VariableInformation(   1, NibeDataType.U8 , Type.SETTING , "Period Pool 2"));
                     put(48174, new VariableInformation(   1, NibeDataType.S8 , Type.SETTING , "Min cooling supply temp S4"));
                     put(48175, new VariableInformation(   1, NibeDataType.S8 , Type.SETTING , "Min cooling supply temp S3"));
