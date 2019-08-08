@@ -81,6 +81,14 @@
 		<description>Zone Status (Open/Closed)</description>
 		<state readOnly="true"></state>
 	</channel-type>
+	
+	<channel-type id="tripped_last">
+		<item-type>DateTime</item-type>
+		<label>Zone Tripped Last</label>
+		<description>Zone Tripped Last Time</description>
+		<category>Date</category>
+		<state readOnly="true" />
+	</channel-type>
 
 	<channel-type id="bypass_mode">
 		<item-type>Switch</item-type>
