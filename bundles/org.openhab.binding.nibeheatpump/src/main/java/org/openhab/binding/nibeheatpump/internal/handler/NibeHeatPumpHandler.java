@@ -375,6 +375,10 @@ public class NibeHeatPumpHandler extends BaseThingHandler implements NibeHeatPum
         return configuration.refreshInterval * 1000;
     }
 
+    private long debounceIntervalMillis() {
+        return configuration.refreshInterval * 1000;
+    }
+
     private int convertStateToNibeValue(Command command) {
         int value;
 
@@ -539,7 +543,7 @@ public class NibeHeatPumpHandler extends BaseThingHandler implements NibeHeatPum
             CacheObject oldValue = stateMap.get(coilAddress);
             stateMap.put(coilAddress, new CacheObject(System.currentTimeMillis(), val));
 
-            if (oldValue != null && (val == oldValue.value || Math.abs(val - oldValue.value) <= variableInfo.threshold)) {
+            if (oldValue != null && (val == oldValue.value || (oldValue.lastUpdateTime + debounceIntervalMillis() > System.currentTimeMillis() && Math.abs(val - oldValue.value) <= variableInfo.threshold))) {
                 logger.trace("Value did not change, ignoring update");
             } else {
                 final String channelPrefix = (variableInfo.type == Type.SETTING ? "setting#" : "sensor#");
