@@ -539,12 +539,12 @@ public class NibeHeatPumpHandler extends BaseThingHandler implements NibeHeatPum
             CacheObject oldValue = stateMap.get(coilAddress);
             stateMap.put(coilAddress, new CacheObject(System.currentTimeMillis(), val));
 
-            if (oldValue != null && val == oldValue.value) {
+            if (oldValue != null && (val == oldValue.value || Math.abs(val - oldValue.value) <= variableInfo.threshold)) {
                 logger.trace("Value did not change, ignoring update");
             } else {
                 final String channelPrefix = (variableInfo.type == Type.SETTING ? "setting#" : "sensor#");
                 final String channelId = channelPrefix + String.valueOf(coilAddress);
-                final String acceptedItemType = thing.getChannel(channelId).getAcceptedItemType();
+                final String acceptedItemType = getThing().getChannel(channelId).getAcceptedItemType();
 
                 logger.trace("AcceptedItemType for channel {} = {}", channelId, acceptedItemType);
                 State state = convertNibeValueToState(variableInfo.dataType, val, acceptedItemType);

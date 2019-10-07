@@ -32,20 +32,20 @@ public class F1X45 {
             .unmodifiableMap(new HashMap<Integer, VariableInformation>() {
                 {
                     // @formatter:off
-                    put(40004, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "BT1 Outdoor temp"));
+                    put(40004, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "BT1 Outdoor temp"));
                     put(40005, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EP23-BT2 Supply temp S4"));
                     put(40006, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EP22-BT2 Supply temp S3"));
                     put(40007, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EP21-BT2 Supply temp S2"));
-                    put(40008, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "BT2 Supply temp S1"));
-                    put(40012, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-EP14-BT3 Return temp"));
+                    put(40008, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "BT2 Supply temp S1"));
+                    put(40012, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "EB100-EP14-BT3 Return temp"));
                     put(40013, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "BT7 Hot Water top"));
-                    put(40014, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "BT6 Hot Water load"));
-                    put(40015, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-EP14-BT10 Brine in temp"));
-                    put(40016, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-EP14-BT11 Brine out temp"));
-                    put(40017, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-EP14-BT12 Cond. out"));
-                    put(40018, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-EP14-BT14 Hot gas temp"));
-                    put(40019, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-EP14-BT15 Liquid line"));
-                    put(40022, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-EP14-BT17 Suction"));
+                    put(40014, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "BT6 Hot Water load"));
+                    put(40015, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "EB100-EP14-BT10 Brine in temp"));
+                    put(40016, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "EB100-EP14-BT11 Brine out temp"));
+                    put(40017, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "EB100-EP14-BT12 Cond. out"));
+                    put(40018, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "EB100-EP14-BT14 Hot gas temp"));
+                    put(40019, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2, "EB100-EP14-BT15 Liquid line"));
+                    put(40022, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , 0.2,"EB100-EP14-BT17 Suction"));
                     put(40025, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-BT20 Exhaust air temp. 1"));
                     put(40026, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "EB100-BT21 Vented air temp. 1"));
                     put(40028, new VariableInformation(  10, NibeDataType.S16, Type.SENSOR  , "AZ1-BT26 Temp Collector in FLM 1"));

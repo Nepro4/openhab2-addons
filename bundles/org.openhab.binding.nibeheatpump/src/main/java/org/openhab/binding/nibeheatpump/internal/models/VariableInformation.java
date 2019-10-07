@@ -36,15 +36,21 @@ public class VariableInformation {
     public int factor;
     public NibeDataType dataType;
     public Type type;
+    public double threshold;
     public String variable;
 
     public VariableInformation() {
     }
 
     public VariableInformation(int factor, NibeDataType dataType, Type type, String variable) {
+        this(factor, dataType, type, 0, variable);
+    }
+
+    public VariableInformation(int factor, NibeDataType dataType, Type type, double threshold, String variable) {
         this.factor = factor;
         this.dataType = dataType;
         this.type = type;
+        this.threshold = threshold;
         this.variable = variable;
     }
 
@@ -70,6 +76,7 @@ public class VariableInformation {
         str += "Factor = " + factor;
         str += ", DataType = " + dataType;
         str += ", Type = " + type;
+        str += ", Threshold = " + threshold;
         str += ", VariableName = " + variable;
 
         return str;
