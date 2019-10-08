@@ -86,6 +86,7 @@ public class NibeHeatPumpHandler extends BaseThingHandler implements NibeHeatPum
     private final List<Integer> itemsToEnableWrite = new ArrayList<>();
 
     private final Map<Integer, CacheObject> stateMap = Collections.synchronizedMap(new HashMap<Integer, CacheObject>());
+    private final Map<String, CacheObject> finalStateMap = Collections.synchronizedMap(new HashMap<String, CacheObject>());
 
     private long lastUpdateTime = 0;
 
@@ -97,6 +98,9 @@ public class NibeHeatPumpHandler extends BaseThingHandler implements NibeHeatPum
         /** Cache value */
         final Double value;
 
+        /** State value */
+        final State state;
+
         /**
          * Initialize cache object.
          *
@@ -107,8 +111,13 @@ public class NibeHeatPumpHandler extends BaseThingHandler implements NibeHeatPum
          *                           Cache value.
          */
         CacheObject(long lastUpdateTime, Double value) {
+            this(lastUpdateTime, value, null);
+        }
+
+        CacheObject(long lastUpdateTime, Double value, State state) {
             this.lastUpdateTime = lastUpdateTime;
             this.value = value;
+            this.state = state;
         }
     }
 
@@ -541,19 +550,27 @@ public class NibeHeatPumpHandler extends BaseThingHandler implements NibeHeatPum
             logger.debug("{} = {}", coilAddress + ":" + variableInfo.variable, val);
 
             CacheObject oldValue = stateMap.get(coilAddress);
+            stateMap.put(coilAddress, new CacheObject(System.currentTimeMillis(), val));
 
-            if (oldValue != null && (val == oldValue.value || (oldValue.lastUpdateTime + debounceIntervalMillis() > System.currentTimeMillis() && Math.abs(val - oldValue.value) <= variableInfo.threshold))) {
+            if (oldValue != null && val == oldValue.value) {
                 logger.trace("Value did not change, ignoring update");
             } else {
-                stateMap.put(coilAddress, new CacheObject(System.currentTimeMillis(), val));
-
                 final String channelPrefix = (variableInfo.type == Type.SETTING ? "setting#" : "sensor#");
                 final String channelId = channelPrefix + String.valueOf(coilAddress);
-                final String acceptedItemType = getThing().getChannel(channelId).getAcceptedItemType();
+                final String acceptedItemType = thing.getChannel(channelId).getAcceptedItemType();
 
                 logger.trace("AcceptedItemType for channel {} = {}", channelId, acceptedItemType);
                 State state = convertNibeValueToState(variableInfo.dataType, val, acceptedItemType);
-                updateState(new ChannelUID(getThing().getUID(), channelId), state);
+
+                boolean updateState = true;
+                CacheObject oldState = finalStateMap.get(channelId);
+                if (oldState != null && oldState.state != null && variableInfo.threshold != 0) {
+                    updateState = oldState.lastUpdateTime + debounceIntervalMillis() < System.currentTimeMillis() || Math.abs(val - oldState.value) > variableInfo.threshold;
+                }
+                if (updateState) {
+                    finalStateMap.put(channelId, new CacheObject(System.currentTimeMillis(), val, state));
+                    updateState(new ChannelUID(getThing().getUID(), channelId), state);
+                }
             }
         } else {
             logger.debug("Unknown register {}", coilAddress);
